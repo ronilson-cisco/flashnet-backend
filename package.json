@@ -1,0 +1,19 @@
+{
+  "name": "flashnet.serve",
+  "version": "1.0.0",
+  "description": "Backend FlashNet OTP",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Ronilson",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "axios": "^1.7.0"
+  }
+}

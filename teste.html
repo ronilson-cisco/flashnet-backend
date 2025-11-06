@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste rota WhatsApp</title>
+</head>
+<body>
+  <h2>Testar envio de número WhatsApp</h2>
+  <form id="formOtp">
+    <label>Digite o número (com DDD e +55):</label><br>
+    <input type="text" id="numero" placeholder="+5599999999999" required><br><br>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <h3>Resposta:</h3>
+  <pre id="resposta"></pre>
+
+  <script>
+    document.getElementById('formOtp').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const numero = document.getElementById('numero').value;
+
+      const res = await fetch('https://hawthorny-loura-inexpressibly.ngrok-free.dev/enviar-otp', {
+
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numero })
+      });
+
+      const data = await res.json();
+      document.getElementById('resposta').textContent = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>
