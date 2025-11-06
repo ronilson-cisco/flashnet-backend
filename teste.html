@@ -2,33 +2,105 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Teste rota WhatsApp</title>
+  <title>FlashNet Hotspot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #ff0000, #00008b);
+      color: #fff;
+      text-align: center;
+      padding-top: 50px;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 250px;
+      font-size: 1em;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #fff;
+      color: #00008b;
+      font-weight: bold;
+    }
+
+    #mensagem {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>Testar envio de número WhatsApp</h2>
+  <h1>Seja bem-vindo à rede FlashNet!</h1>
+  <p>Digite seu número de WhatsApp para receber o código OTP.</p>
+
   <form id="formOtp">
-    <label>Digite o número (com DDD e +55):</label><br>
-    <input type="text" id="numero" placeholder="+5599999999999" required><br><br>
-    <button type="submit">Enviar</button>
+    <input type="text" id="numero" placeholder="+5599999999999" required><br>
+    <button type="submit">Enviar código</button>
   </form>
 
-  <h3>Resposta:</h3>
-  <pre id="resposta"></pre>
+  <form id="formValidar" style="display:none;">
+    <input type="text" id="codigo" placeholder="Digite o código OTP" required><br>
+    <button type="submit">Validar código</button>
+  </form>
+
+  <div id="mensagem"></div>
 
   <script>
-    document.getElementById('formOtp').addEventListener('submit', async (e) => {
+    const servidor = 'https://flashnet-backend.onrender.com';
+
+    const formOtp = document.getElementById('formOtp');
+    const formValidar = document.getElementById('formValidar');
+    const mensagem = document.getElementById('mensagem');
+
+    let codigoGerado = null;
+
+    // Enviar OTP
+    formOtp.addEventListener('submit', async (e) => {
       e.preventDefault();
       const numero = document.getElementById('numero').value;
 
-      const res = await fetch('https://hawthorny-loura-inexpressibly.ngrok-free.dev/enviar-otp', {
+      try {
+        const res = await fetch(`${servidor}/enviar-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numero })
+        });
+        const data = await res.json();
+        if(data.sucesso){
+          codigoGerado = data.codigoOTP;
+          mensagem.textContent = "Código enviado! Digite abaixo para validar.";
+          formOtp.style.display = 'none';
+          formValidar.style.display = 'block';
+        } else {
+          mensagem.textContent = "Erro ao enviar código. Tente novamente.";
+        }
+      } catch(err){
+        mensagem.textContent = "Erro de conexão com o servidor.";
+        console.error(err);
+      }
+    });
 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ numero })
-      });
+    // Validar OTP
+    formValidar.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const codigo = document.getElementById('codigo').value;
 
-      const data = await res.json();
-      document.getElementById('resposta').textContent = JSON.stringify(data, null, 2);
+      if(codigo === codigoGerado.toString()){
+        mensagem.textContent = "Conectado com sucesso!";
+        formValidar.style.display = 'none';
+      } else {
+        mensagem.textContent = "Código incorreto. Tente novamente.";
+      }
     });
   </script>
 </body>
